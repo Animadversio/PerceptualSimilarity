@@ -50,7 +50,7 @@ class PNetLin(nn.Module):
         self.net = net_type(pretrained=not self.pnet_rand, requires_grad=self.pnet_tune)
 
         if(lpips):
-            self.lin0 = NetLinLayer(self.chns[0], use_dropout=use_dropout)
+            self.lin0 = NetLinLayer(self.chns[0], use_dropout=use_dropout)  # use different weights for each channel to
             self.lin1 = NetLinLayer(self.chns[1], use_dropout=use_dropout)
             self.lin2 = NetLinLayer(self.chns[2], use_dropout=use_dropout)
             self.lin3 = NetLinLayer(self.chns[3], use_dropout=use_dropout)
@@ -72,7 +72,7 @@ class PNetLin(nn.Module):
             diffs[kk] = (feats0[kk]-feats1[kk])**2
 
         if(self.lpips):
-            if(self.spatial):
+            if(self.spatial):  # upsample the difference in each layer to original image size.
                 res = [upsample(self.lins[kk].model(diffs[kk]), out_H=in0.shape[2]) for kk in range(self.L)]
             else:
                 res = [spatial_average(self.lins[kk].model(diffs[kk]), keepdim=True) for kk in range(self.L)]
